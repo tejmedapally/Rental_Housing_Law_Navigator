@@ -1,0 +1,5 @@
+SOURCE: https://example.test/f001
+RETRIEVED: 2026-10-01 00:00 UTC
+
+A security deposit may not
+exceed one month of rent. Effective 2026-01-01.

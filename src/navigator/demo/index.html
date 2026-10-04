@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rental Housing Law Navigator</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("navigator-theme");
+        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+      } catch (error) {
+        /* The page still follows the system theme. */
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1a2332;
+      --muted: #5c6573;
+      --paper: #f4f1eb;
+      --surface: #fffcf8;
+      --banner: #102033;
+      --banner-ink: #f7f4ee;
+      --line: #e3ddd3;
+      --accent: #0e6b66;
+      --accent-soft: #e5f3f1;
+      --review: #8a4b08;
+      --review-bg: #fff4e5;
+      --shadow: 0 16px 40px rgba(16, 32, 51, 0.08);
+      --serif: "Palatino Linotype", Palatino, "Iowan Old Style", Georgia, serif;
+      --sans: "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --ink: #f3efe8;
+        --muted: #b7c0cc;
+        --paper: #101820;
+        --surface: #182430;
+        --banner: #0b141e;
+        --banner-ink: #f7f4ee;
+        --line: #2c3b4c;
+        --accent: #7dccc4;
+        --accent-soft: #163833;
+        --review: #f0c48a;
+        --review-bg: #3a2a16;
+        --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #f3efe8;
+      --muted: #b7c0cc;
+      --paper: #101820;
+      --surface: #182430;
+      --banner: #0b141e;
+      --banner-ink: #f7f4ee;
+      --line: #2c3b4c;
+      --accent: #7dccc4;
+      --accent-soft: #163833;
+      --review: #f0c48a;
+      --review-bg: #3a2a16;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    }
+    :root[data-theme="light"] {
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: var(--sans);
+      color: var(--ink);
+      background:
+        radial-gradient(900px 420px at 100% -10%, rgba(14, 107, 102, 0.08), transparent 60%),
+        var(--paper);
+    }
+    a { color: var(--accent); }
+    .skip {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      background: var(--surface);
+      color: var(--ink);
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+    }
+    .skip:focus { top: 0.75rem; z-index: 5; }
+    .site-header {
+      background: var(--banner);
+      color: var(--banner-ink);
+    }
+    .header-bar, .disclaimer, .section-wrap, .site-footer-inner {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      align-items: flex-end;
+      padding: 1.35rem 0 1.1rem;
+    }
+    .kicker {
+      margin: 0;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      color: #c9d4c8;
+    }
+    .wordmark {
+      margin: 0.2rem 0 0;
+      font-family: var(--serif);
+      font-size: clamp(1.7rem, 3vw, 2.35rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .header-actions a {
+      color: inherit;
+      text-decoration: none;
+      font-size: 0.92rem;
+    }
+    .header-actions a:hover { text-decoration: underline; }
+    button.theme-toggle {
+      font: inherit;
+      color: var(--banner-ink);
+      background: transparent;
+      border: 1px solid rgba(247, 244, 238, 0.35);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      cursor: pointer;
+    }
+    button.theme-toggle:hover { background: rgba(255, 255, 255, 0.08); }
+    button.theme-toggle:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .disclaimer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.25rem;
+      align-items: baseline;
+      padding: 0.7rem 0;
+      border-top: 1px solid rgba(247, 244, 238, 0.16);
+      font-size: 0.92rem;
+    }
+    .disclaimer strong { font-weight: 650; }
+    main { flex: 1; width: min(1120px, calc(100% - 2rem)); margin: 0 auto; padding: 1.75rem 0 2.5rem; }
+    .intro { margin-bottom: 1.4rem; }
+    .intro h1 {
+      margin: 0 0 0.4rem;
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      font-weight: 600;
+    }
+    .intro p { margin: 0; color: var(--muted); line-height: 1.5; }
+    @media (min-width: 960px) {
+      .intro h1, .intro p { white-space: nowrap; }
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(18rem, 28rem) minmax(0, 1fr);
+      grid-template-areas:
+        "picker details"
+        "results results";
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+    .dossier { display: contents; }
+    #place { grid-area: details; height: 100%; }
+    .results-wrap { grid-area: results; }
+    .picker, .card, .change-case {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .picker {
+      grid-area: picker;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 1rem 1rem 1.1rem;
+    }
+    .picker select { flex: 1 1 auto; min-height: 14rem; }
+    label { display: block; font-weight: 650; margin-bottom: 0.4rem; }
+    input[type="search"], select { width: 100%; font: inherit; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; }
+    input[type="search"] { padding: 0.7rem 0.8rem; margin-bottom: 0.6rem; }
+    select { padding: 0.35rem; }
+    .card { margin-top: 0; padding: 1.1rem 1.2rem 1.2rem; }
+    #results .card + .card { margin-top: 0.85rem; }
+    .results-wrap h2 { margin-bottom: 0.8rem; }
+    .muted { color: var(--muted); }
+    .review { border-color: var(--review); background: var(--review-bg); }
+    .card-top { display: flex; justify-content: space-between; gap: 0.75rem; align-items: flex-start; }
+    .address-id {
+      flex: none;
+      margin: 0;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 750;
+      letter-spacing: 0.06em;
+    }
+    h2 { font-family: var(--serif); font-size: 1.25rem; font-weight: 600; margin: 0 0 0.45rem; }
+    .card h2 { margin: 0; font-size: 1.15rem; }
+    .pill {
+      flex: none;
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .pill.unknown, .pill.superseded { background: var(--paper); color: var(--muted); }
+    .pill.pending, .pill.not_yet_effective { background: var(--review-bg); color: var(--review); }
+    p { line-height: 1.5; }
+    dl { display: grid; grid-template-columns: 12.5rem 1fr; gap: 0.35rem 0.75rem; margin: 0.8rem 0 0; }
+    dt { color: var(--muted); }
+    dd { margin: 0; }
+    blockquote {
+      margin: 0.9rem 0 0;
+      padding: 0.75rem 0 0.1rem 0.9rem;
+      border-left: 3px solid var(--accent);
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+    .changes { margin-top: 2.2rem; }
+    .section-kicker { margin: 0; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.72rem; font-weight: 700; }
+    #change-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.8rem; margin-top: 0.8rem; }
+    .change-case { padding: 1rem 1.05rem; }
+    .change-case h3 { margin: 0 0 0.35rem; font-family: var(--serif); }
+    .change-case p { margin: 0.25rem 0; }
+    .site-footer { margin-top: auto; border-top: 1px solid var(--line); background: var(--surface); }
+    .site-footer-inner { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; padding: 1.4rem 0 1.6rem; }
+    .site-footer p { margin: 0.25rem 0; color: var(--muted); }
+    .site-footer strong { color: var(--ink); }
+    @media (max-width: 800px) {
+      .header-bar, .site-footer-inner, .workspace { display: block; }
+      .header-actions { margin-top: 0.9rem; }
+      .picker { height: auto; margin-bottom: 1rem; }
+      #place { height: auto; }
+      dl { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to address lookup</a>
+  <header class="site-header">
+    <div class="header-bar">
+      <div>
+        <p class="kicker">Public law lookup</p>
+        <p class="wordmark">Rental Housing Law Navigator</p>
+      </div>
+      <div class="header-actions">
+        <a href="#workspace">Addresses</a>
+        <a href="#changes">Change cases</a>
+        <button class="theme-toggle" id="theme-toggle" type="button">Use dark theme</button>
+      </div>
+    </div>
+    <div class="disclaimer" role="note">
+      <strong>Not legal advice.</strong>
+      <span>Not a compliance certification.</span>
+      <span>As of <span id="as-of">not loaded</span></span>
+    </div>
+  </header>
+  <main>
+    <div class="intro">
+      <h1>See which captured housing rules meet a sample address.</h1>
+      <p>Each result quotes a passage from the starter-pack corpus. The legal city comes from the Census geocode. The mailing city is not the legal city.</p>
+    </div>
+    <section id="workspace" class="workspace">
+      <aside class="picker">
+        <label for="address-query">Find a sample address</label>
+        <input id="address-query" type="search" placeholder="Type an address id or street" autocomplete="off">
+        <select id="address" size="12" aria-label="Sample addresses"></select>
+      </aside>
+      <div class="dossier">
+        <section id="place" class="card" hidden></section>
+        <div class="results-wrap">
+          <p class="section-kicker">Rules</p>
+          <h2>Results for this address</h2>
+          <section id="results"></section>
+        </div>
+      </div>
+    </section>
+    <section id="changes" class="changes">
+      <p class="section-kicker">Tracking</p>
+      <h2>Change cases T1–T5</h2>
+      <div id="change-list" class="muted">Change cases not loaded.</div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div>
+        <p><strong>Not legal advice.</strong> Not a compliance certification.</p>
+        <p>Quoted passages are slices of captured public text. A missing coverage fact stays unknown.</p>
+      </div>
+      <div>
+        <p>California, New Jersey, and Massachusetts sample addresses.</p>
+        <p>As of <span id="as-of-footer">not loaded</span>.</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const state = { rules: {}, lookups: { as_of: "", lookups: {} }, geocodes: {} };
+
+    function ruleById(id) {
+      return state.rules[id] || {};
+    }
+
+    function mailingAddress(geo) {
+      return [geo.street_address, geo.postal_city, geo.legal_state, geo.zip].filter(Boolean).join(", ");
+    }
+
+    function sampleValue(value) {
+      return value === null || value === undefined || value === "" ? "not in the sample" : String(value);
+    }
+
+    function yearsSinceBuilt(year) {
+      if (year === null || year === undefined || year === "") return "not in the sample";
+      const asOfYear = Number(String(state.lookups.as_of || "").slice(0, 4));
+      if (!Number.isFinite(asOfYear)) return "not in the sample";
+      return String(asOfYear - Number(year)) + " as of " + asOfYear;
+    }
+
+    function useLabel(geo) {
+      const code = geo.use_code || "";
+      const description = geo.use_description || "";
+      if (code && description) return code + " — " + description;
+      return sampleValue(code || description);
+    }
+
+    function render(addressId) {
+      const place = document.getElementById("place");
+      const results = document.getElementById("results");
+      const geo = state.geocodes[addressId] || {};
+      const rows = (state.lookups.lookups || {})[addressId] || [];
+      place.hidden = false;
+      place.innerHTML = "";
+      const kicker = document.createElement("p");
+      kicker.className = "section-kicker";
+      kicker.textContent = "Address details";
+      const titleRow = document.createElement("div");
+      titleRow.className = "card-top";
+      const heading = document.createElement("h2");
+      heading.textContent = [geo.street_address, geo.postal_city].filter(Boolean).join(", ") || addressId;
+      const identifier = document.createElement("p");
+      identifier.className = "address-id";
+      identifier.textContent = addressId;
+      titleRow.append(heading, identifier);
+      const facts = document.createElement("dl");
+      const pairs = [
+        ["Legal state", geo.legal_state || "unknown"],
+        ["Legal county", geo.legal_county || "unknown"],
+        ["Legal city", geo.legal_city || "unknown"],
+        ["Census match", geo.match_status || "unknown"],
+        ["Year built", sampleValue(geo.year_built)],
+        ["Years since year built", yearsSinceBuilt(geo.year_built)],
+        ["Units", sampleValue(geo.units)],
+        ["Use", useLabel(geo)],
+        ["Assessor source", sampleValue(geo.source_dataset)],
+        ["Sample retrieved", sampleValue(geo.sample_retrieved_at)]
+      ];
+      for (const [name, value] of pairs) {
+        const term = document.createElement("dt");
+        term.textContent = name;
+        const detail = document.createElement("dd");
+        detail.textContent = value;
+        facts.append(term, detail);
+      }
+      place.append(kicker, titleRow, facts);
+      results.replaceChildren();
+      if (rows.length === 0) {
+        const empty = document.createElement("section");
+        empty.className = "card";
+        empty.textContent = "No supplied rule applies to this address on the as-of date.";
+        results.append(empty);
+        return;
+      }
+      for (const row of rows) {
+        const rule = ruleById(row.team_rule_id);
+        const card = document.createElement("article");
+        card.className = row.conflict_flag ? "card review" : "card";
+        const top = document.createElement("div");
+        top.className = "card-top";
+        const title = document.createElement("h2");
+        title.textContent = rule.title || row.team_rule_id;
+        const pill = document.createElement("span");
+        pill.className = "pill " + String(row.result || "").replaceAll(" ", "_");
+        pill.textContent = row.result || "";
+        top.append(title, pill);
+        const summary = document.createElement("p");
+        summary.textContent = row.explanation || "";
+        card.append(top, summary);
+        if (row.conflict_flag) {
+          const flag = document.createElement("p");
+          flag.textContent = "Flagged for human review.";
+          card.append(flag);
+        }
+        const meta = document.createElement("dl");
+        const fields = [
+          ["Citation", rule.citation || ""],
+          ["Source document", rule.source_doc_id || ""],
+          ["Retrieved", rule.retrieved_at || "not recorded on this rule"]
+        ];
+        for (const [name, value] of fields) {
+          const term = document.createElement("dt");
+          term.textContent = name;
+          const detail = document.createElement("dd");
+          detail.textContent = value;
+          meta.append(term, detail);
+        }
+        const quote = document.createElement("blockquote");
+        quote.textContent = rule.quoted_span || "";
+        card.append(meta, quote);
+        results.append(card);
+      }
+    }
+
+    function optionLabel(id) {
+      const geo = state.geocodes[id] || {};
+      const place = [geo.street_address, geo.postal_city].filter(Boolean).join(", ");
+      return place ? id + " — " + place : id;
+    }
+
+    function fillAddresses(query) {
+      const select = document.getElementById("address");
+      const needle = query.trim().toLowerCase();
+      const previous = select.value;
+      select.replaceChildren();
+      const ids = new Set(Object.keys(state.geocodes || {}));
+      for (const id of Object.keys((state.lookups && state.lookups.lookups) || {})) {
+        ids.add(id);
+      }
+      for (const id of [...ids].sort()) {
+        const label = optionLabel(id);
+        if (needle && !id.toLowerCase().includes(needle) && !label.toLowerCase().includes(needle)) {
+          continue;
+        }
+        const option = document.createElement("option");
+        option.value = id;
+        option.textContent = label;
+        select.append(option);
+      }
+      if ([...select.options].some((option) => option.value === previous)) {
+        select.value = previous;
+      }
+    }
+
+    async function loadJson(url) {
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(url);
+      }
+      return response.json();
+    }
+
+    function showAsOf(value) {
+      const text = value || "not loaded";
+      document.getElementById("as-of").textContent = text;
+      document.getElementById("as-of-footer").textContent = text;
+    }
+
+    async function load() {
+      const lookups = await loadJson("output/lookups.json");
+      state.lookups = lookups;
+      showAsOf(lookups.as_of);
+      const select = document.getElementById("address");
+      const query = document.getElementById("address-query");
+      fillAddresses("");
+      select.addEventListener("change", () => render(select.value));
+      query.addEventListener("input", () => {
+        fillAddresses(query.value);
+        if (select.options.length === 1) {
+          select.selectedIndex = 0;
+          render(select.value);
+        }
+      });
+      if (select.options.length > 0) {
+        render(select.value);
+      }
+      const [rulesFile, geocodes] = await Promise.all([
+        loadJson("output/rules.json"),
+        loadJson("output/geocodes.json")
+      ]);
+      state.rules = Object.fromEntries((rulesFile.rules || []).map((rule) => [rule.team_rule_id, rule]));
+      state.geocodes = geocodes.geocodes || {};
+      fillAddresses(query.value);
+      if (select.value) {
+        render(select.value);
+      }
+    }
+
+    async function loadChanges() {
+      const list = document.getElementById("change-list");
+      try {
+        const response = await fetch("output/changes.json");
+        if (!response.ok) {
+          return;
+        }
+        const report = await response.json();
+        list.replaceChildren();
+        list.classList.remove("muted");
+        for (const id of ["T1", "T2", "T3", "T4", "T5"]) {
+          const item = report[id] || {};
+          const affected = item.affected_address_ids || [];
+          const flagged = item.conflict_flag_address_ids || [];
+          const article = document.createElement("article");
+          article.className = "change-case";
+          const title = document.createElement("h3");
+          title.textContent = id;
+          const counts = document.createElement("p");
+          counts.textContent = "Affected: " + affected.length + ". Flagged for review: " + flagged.length + ".";
+          const notes = document.createElement("p");
+          notes.textContent = item.notes || "";
+          article.append(title, counts, notes);
+          list.append(article);
+        }
+      } catch (error) {
+        list.textContent = "Change cases not loaded.";
+      }
+    }
+
+    function activeTheme() {
+      const chosen = document.documentElement.dataset.theme;
+      if (chosen === "dark" || chosen === "light") return chosen;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+
+    function syncThemeButton() {
+      const toggle = document.getElementById("theme-toggle");
+      const dark = activeTheme() === "dark";
+      toggle.textContent = dark ? "Use light theme" : "Use dark theme";
+      toggle.setAttribute("aria-pressed", dark ? "true" : "false");
+    }
+
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const next = activeTheme() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem("navigator-theme", next);
+      } catch (error) {
+        /* The choice still applies for this page view. */
+      }
+      syncThemeButton();
+    });
+    syncThemeButton();
+
+    load().catch(() => {
+      showAsOf("lookup file not loaded");
+    });
+    loadChanges();
+  </script>
+</body>
+</html>

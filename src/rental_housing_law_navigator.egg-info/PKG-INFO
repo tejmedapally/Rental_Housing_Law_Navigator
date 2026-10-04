@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: rental-housing-law-navigator
+Version: 0.1.0
+Summary: Cited housing-rule catalog, address lookup, and change cases.
+Requires-Python: >=3.13
+Requires-Dist: jsonschema
+Requires-Dist: pytest

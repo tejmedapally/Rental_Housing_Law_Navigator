@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rental-housing-law-navigator"
+version = "0.1.0"
+description = "Cited housing-rule catalog, address lookup, and change cases."
+requires-python = ">=3.13"
+dependencies = [
+    "jsonschema",
+    "pytest",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

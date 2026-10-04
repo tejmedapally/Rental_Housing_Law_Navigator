@@ -1,0 +1,31 @@
+{
+  "result": {
+    "input": {
+      "address": {
+        "address": "14547 SYLVAN ST",
+        "city": "Van Nuys",
+        "state": "CA"
+      },
+      "benchmark": {
+        "benchmarkName": "Public_AR_Current"
+      }
+    },
+    "addressMatches": [
+      {
+        "matchedAddress": "14547 SYLVAN ST, LOS ANGELES, CA, 91401",
+        "coordinates": { "x": -118.448, "y": 34.186 },
+        "geographies": {
+          "States": [
+            { "STUSAB": "CA", "NAME": "California", "GEOID": "06" }
+          ],
+          "Counties": [
+            { "BASENAME": "Los Angeles", "NAME": "Los Angeles County", "GEOID": "06037" }
+          ],
+          "Incorporated Places": [
+            { "BASENAME": "Los Angeles", "NAME": "Los Angeles city", "GEOID": "0644000" }
+          ]
+        }
+      }
+    ]
+  }
+}
